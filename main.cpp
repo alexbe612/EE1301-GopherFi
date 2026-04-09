@@ -10,9 +10,11 @@
 using namespace std;
 
 int main() {
-
-
-
+    int a;
+    bool b;
+    double c;
+    void* d;
+    a
 
 
 
