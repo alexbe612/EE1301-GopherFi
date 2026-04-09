@@ -29,7 +29,7 @@ unsigned int z4;
     bool b;
     double c;
     void* d;
-    a
+    /*we're fried*/
 
 
 
