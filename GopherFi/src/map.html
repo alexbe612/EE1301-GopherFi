@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live UMN Wi-Fi Signal Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; }
+        .controls { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        button { padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 16px; }
+        button:hover { background-color: #218838; }
+        #map { height: 600px; width: 100%; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .status { color: #555; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <h2>📍 Live UMN Wi-Fi Signal Map</h2>
+    
+    <div class="controls">
+        <span class="status" id="statusText">Waiting to load data...</span>
+        <button onclick="fetchSheetData()">🔄 Refresh Map Data</button>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // --- 1. SET UP THE UMN BOUNDED MAP ---
+        var umnBounds = [
+            [44.9650, -93.2550], // Southwest 
+            [44.9880, -93.2100]  // Northeast
+        ];
+
+        var map = L.map('map', {
+            center: [44.9740, -93.2277], // Center on Coffman Union
+            zoom: 15,
+            minZoom: 14,
+            maxBounds: umnBounds,
+            maxBoundsViscosity: 1.0
+        });
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        // We create a "Layer Group" to hold our markers. 
+        // This allows us to clear old markers before drawing new ones when we hit Refresh.
+        var markerLayer = L.layerGroup().addTo(map);
+
+        // --- 2. FUNCTION TO FETCH AND PLOT GOOGLE SHEET DATA ---
+        function fetchSheetData() {
+            document.getElementById('statusText').innerText = "Fetching live data...";
+            
+            // REPLACE THIS LINK WITH YOUR PUBLISHED CSV LINK
+            var sheetCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRvvJkw8dEf6RtQ4SPHWFcmDQkunyoQlfcSS_OhtgbPX651UP-1C6Dgonf1QKdcCvlIB19BHtVNxjoq/pub?output=csv";
+
+            Papa.parse(sheetCsvUrl, {
+                download: true,
+                header: false, // We treat it as a raw array [Date, Lat, Lon, Strength]
+                complete: function(results) {
+                    // Clear out any existing dots on the map
+                    markerLayer.clearLayers();
+                    var pointsPlotted = 0;
+
+                    // Loop through every row in the spreadsheet
+                    results.data.forEach(function(row) {
+                        // Make sure the row has at least 4 columns of data
+                        if (row.length >= 4) {
+                            var dateStr = row[0];
+                            var lat = parseFloat(row[1]);
+                            var lon = parseFloat(row[2]);
+                            var strength = parseInt(row[3]);
+
+                            // If lat, lon, and strength are valid numbers (this automatically skips header rows!)
+                            if (!isNaN(lat) && !isNaN(lon) && !isNaN(strength)) {
+                                
+                                // Determine the color
+                                var markerColor = "red";
+                                if (strength >= 70) markerColor = "green";
+                                else if (strength >= 40) markerColor = "orange";
+
+                                // Create the circle marker
+                                var marker = L.circleMarker([lat, lon], {
+                                    radius: 8,
+                                    fillColor: markerColor,
+                                    color: "#000",
+                                    weight: 1,
+                                    opacity: 1,
+                                    fillOpacity: 0.8
+                                });
+
+                                // Add a popup showing the exact date/time and strength
+                                marker.bindPopup("<b>Strength:</b> " + strength + "%<br><b>Logged:</b> " + dateStr);
+                                
+                                // Add the marker to our map layer
+                                marker.addTo(markerLayer);
+                                pointsPlotted++;
+                            }
+                        }
+                    });
+
+                    document.getElementById('statusText').innerText = "Successfully mapped " + pointsPlotted + " data points!";
+                },
+                error: function() {
+                    document.getElementById('statusText').innerText = "Error: Could not read Google Sheet. Check your CSV link.";
+                }
+            });
+        }
+
+        // --- 3. AUTO-LOAD DATA WHEN THE PAGE OPENS ---
+        fetchSheetData();
+
+    </script>
+</body>
+</html>
