@@ -133,7 +133,7 @@
                             var strength = parseInt(row[3]);
 
                             // If lat, lon, and strength are valid numbers (this automatically skips header rows!)
-                            if (!isNaN(lat) && !isNaN(lon) && !isNaN(strength)) {
+                            if (!isNaN(lat) && !isNaN(lon) && !isNaN(strength) && lat !== 0 && lon !== 0) {
                                 
                                 // Determine the color
                                 var markerColor = "rgb(255,0,0)";
