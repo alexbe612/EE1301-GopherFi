@@ -15,6 +15,25 @@
         button:hover { background-color: #218838; }
         #map { height: 600px; width: 100%; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .status { color: #555; font-size: 14px; }
+
+        .legend {
+            background: white;
+            padding: 10px;
+            line-height: 20px;
+            color: #333;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+        .legend i {
+            width: 14px;
+            height: 14px;
+            float: left;
+            margin-right: 8px;
+            margin-top: 3px;
+            opacity: 0.8;
+            border: 1px solid #000;
+            border-radius: 50%; /* This makes the color swatches circles instead of squares */
+        }
     </style>
 </head>
 <body>
@@ -51,6 +70,40 @@
 
         // We create a "Layer Group" to hold our markers. 
         // This allows us to clear old markers before drawing new ones when we hit Refresh.
+        // --- ADD A CUSTOM LEGEND TO THE BOTTOM RIGHT ---
+        var legend = L.control({position: 'bottomright'});
+
+        legend.onAdd = function (map) {
+            // Create a new div with the class 'legend'
+            var div = L.DomUtil.create('div', 'legend');
+            
+            // Define the labels and the exact colors from your if/else statements
+            var labels = ["80%+", "70-79%", "60-69%", "50-59%", "40-49%", "30-39%", "20-29%", "20%-"];
+            var colors = [
+                "rgb(0,255,0)",   // 80+
+                "rgb(115,255,0)", // 70-79
+                "rgb(180,255,0)", // 60-69
+                "rgb(255,255,0)", // 50-59
+                "rgb(255,210,0)", // 40-49
+                "rgb(255,140,0)", // 30-39
+                "rgb(255,70,0)",  // 20-29
+                "rgb(255,0,0)"    // < 20
+            ];
+
+            // Add a bold title to the legend
+            div.innerHTML += '<strong>Signal Strength</strong><br>';
+
+            // Loop through our labels and generate a colored circle for each one
+            for (var i = 0; i < labels.length; i++) {
+                div.innerHTML += '<i style="background:' + colors[i] + '"></i> ' + labels[i] + '<br>';
+            }
+
+            return div;
+        };
+
+        // Add the legend to the map
+        legend.addTo(map);
+
         var markerLayer = L.layerGroup().addTo(map);
 
         // --- 2. FUNCTION TO FETCH AND PLOT GOOGLE SHEET DATA ---
@@ -70,6 +123,8 @@
 
                     // Loop through every row in the spreadsheet
                     results.data.forEach(function(row) {
+
+                        console.log(row);
                         // Make sure the row has at least 4 columns of data
                         if (row.length >= 4) {
                             var dateStr = row[0];
