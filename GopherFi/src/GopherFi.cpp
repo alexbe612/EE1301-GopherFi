@@ -171,26 +171,34 @@ int g=0;
 int b=0;
 
 if (signal_strength >= 80) {
-  g = 250;
+  g = 255;
 }
 else if (signal_strength >= 70) {
-  g = 250;
-  r = 150;
+  g = 255;
+  r = 115;
 }
 else if (signal_strength >= 60) {
-  g = 200;
-  r = 250;
+  g = 255;
+  r = 180;
 }
 else if (signal_strength >= 50) {
-  g = 130;
-  r = 250;
+  g = 255;
+  r = 255;
 }
 else if (signal_strength >= 40) {
-  g = 80;
-  r = 250;
+  g = 210;
+  r = 255;
+}
+else if (signal_strength >= 30) {
+  g = 140;
+  r = 255;
+}
+else if (signal_strength >= 20) {
+  g = 70;
+  r = 255;
 }
 else {
-  r = 250;
+  r = 255;
 }
 
 int color = strip.Color(g,r,b);
