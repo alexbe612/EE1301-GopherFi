@@ -131,16 +131,16 @@
                                 else if (strength >= 30) markerColor = "#fdae61"; // Orange
                                 else if (strength >= 25) markerColor = "#f46d43"; // Red-Orange
 
-                                // Anything below 25 (including the -1 values) stays #d73027 (Dark Red)
+                                
 
-                                // Create the circle marker with refined visuals
+                                
                                 var marker = L.circleMarker([lat, lon], {
-                                    radius: 6,           // Slightly smaller to reduce overlap
+                                    radius: 6,           
                                     fillColor: markerColor,
-                                    color: "#333",       // Softer border color instead of harsh black
-                                    weight: 0.5,         // Much thinner border 
+                                    color: "#333",       
+                                    weight: 1.0,          
                                     opacity: 1,
-                                    fillOpacity: 0.85    // High enough to be vibrant, low enough to show stacks
+                                    fillOpacity: 0.85    
                                 });
 
                                 marker.bindPopup("<b>Strength:</b> " + strength + "%<br><b>Logged:</b> " + dateStr);
