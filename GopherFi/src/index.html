@@ -72,16 +72,17 @@
         var legend = L.control({position: 'bottomright'});
 
         // Updated High-Contrast Color Palette
-        var labels = ["80%+", "70-79%", "60-69%", "50-59%", "40-49%", "30-39%", "20-29%", "20%-"];
+        // We are stretching 8 colors across a 20 to 55 range
+        var labels = ["55+", "50-54", "45-49", "40-44", "35-39", "30-34", "25-29", "< 25"];
         var colors = [
-            "#1a9850", // 80+ (Dark Green)
-            "#66bd63", // 70-79 (Medium Green)
-            "#a6d96a", // 60-69 (Light Green)
-            "#d9ef8b", // 50-59 (Yellow-Green)
-            "#fee08b", // 40-49 (Yellow-Orange)
-            "#fdae61", // 30-39 (Orange)
-            "#f46d43", // 20-29 (Red-Orange)
-            "#d73027"  // < 20 (Dark Red)
+            "#1a9850", 
+            "#66bd63", 
+            "#a6d96a", 
+            "#d9ef8b", 
+            "#fee08b", 
+            "#fdae61", 
+            "#f46d43", 
+            "#d73027"  
         ];
 
         legend.onAdd = function (map) {
@@ -120,14 +121,17 @@
                             if (!isNaN(lat) && !isNaN(lon) && !isNaN(strength) && lat !== 0 && lon !== 0) {
                                 
                                 // Map strength to the new distinct Hex colors
-                                var markerColor = "#d73027"; // Default Red
-                                if (strength >= 80) markerColor = "#1a9850";
-                                else if (strength >= 70) markerColor = "#66bd63";
-                                else if (strength >= 60) markerColor = "#a6d96a";
-                                else if (strength >= 50) markerColor = "#d9ef8b";
-                                else if (strength >= 40) markerColor = "#fee08b";
-                                else if (strength >= 30) markerColor = "#fdae61";
-                                else if (strength >= 20) markerColor = "#f46d43";
+                                var markerColor = "#d73027"; // Default Dark Red (for < 25 and -1)
+
+                                if (strength >= 55) markerColor = "#1a9850";      // Dark Green
+                                else if (strength >= 50) markerColor = "#66bd63"; // Medium Green
+                                else if (strength >= 45) markerColor = "#a6d96a"; // Light Green
+                                else if (strength >= 40) markerColor = "#d9ef8b"; // Yellow-Green
+                                else if (strength >= 35) markerColor = "#fee08b"; // Yellow-Orange
+                                else if (strength >= 30) markerColor = "#fdae61"; // Orange
+                                else if (strength >= 25) markerColor = "#f46d43"; // Red-Orange
+
+                                // Anything below 25 (including the -1 values) stays #d73027 (Dark Red)
 
                                 // Create the circle marker with refined visuals
                                 var marker = L.circleMarker([lat, lon], {
