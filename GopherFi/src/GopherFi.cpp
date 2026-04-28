@@ -45,34 +45,34 @@ SYSTEM_THREAD(ENABLED);
 
 SerialLogHandler logHandler(LOG_LEVEL_INFO);
 
-// This function trickles the offline data to the cloud 1 per second
+
 int uploadToGoogleSheets(String command) {
   Serial.println("--- INITIATING GOOGLE SHEETS UPLOAD ---");
   
-  // Open the file using standard C fopen (great for reading line-by-line)
+  
   FILE *fp = fopen("/usr/gopherfi.csv", "r");
   
   if (fp != NULL) {
     char line[128]; 
     
-    // Read the file one line at a time until the end
+    
     while (fgets(line, sizeof(line), fp) != NULL) {
       
-      // Remove the newline character from the end of the string
+      
       String payload = String(line).trim();
       
-      // Publish the single line to the Particle Cloud Webhook
+      
       Particle.publish("Google_Sheet_Upload", payload, PRIVATE);
       Serial.println("Uploaded offline point: " + payload);
       
-      // CRITICAL: We must wait 1.1 seconds between publishes so Particle doesn't ban us
+      
       delay(1100); 
     }
     
     fclose(fp);
     Serial.println("--- ALL OFFLINE DATA UPLOADED ---");
     
-    // Clear the file
+    
     remove("/usr/gopherfi.csv");
     Serial.println("Internal file cleared.");
     
@@ -224,27 +224,27 @@ void GopherFiGPS() {
     longitude = (double)gps.location.lng();
   }
 
-// Every 10 seconds, push live data OR save it locally if offline
+
   if (millis() - lastPublishTime > 10000) {
     lastPublishTime = millis();
     
-    // We only want to record if we actually have a valid GPS lock
+    
     if (gps.location.isValid()) {
         
-        // Format exactly like the online data so Google Sheets accepts it
+        
         String logData = String::format("[%f,%f,%f]", latitude, longitude, (double)signal_strength);
-        // CHECK WI-FI CONNECTION
+        
         if (Particle.connected()) {
-            // WE ARE ONLINE - Send to the Particle Console
+            
             Particle.publish("GopherFi_Live", logData, PRIVATE);
             Serial.println("Published to Cloud: " + logData);
         } 
         else {
-            // WE ARE OFFLINE - Save to internal flash memory
+            
             int fd = open("/usr/gopherfi.csv", O_WRONLY | O_CREAT | O_APPEND);
             
             if (fd != -1) {
-                String fileLine = logData + "\n"; // Add a line break for the file
+                String fileLine = logData + "\n"; 
                 write(fd, fileLine.c_str(), fileLine.length());
                 close(fd);
                 Serial.println("Saved locally (Offline): " + logData);
