@@ -30,15 +30,15 @@
             float: left;
             margin-right: 8px;
             margin-top: 3px;
-            opacity: 0.8;
-            border: 1px solid #000;
-            border-radius: 50%; /* This makes the color swatches circles instead of squares */
+            opacity: 0.9;
+            border: 1px solid #777; /* Softer border for legend items */
+            border-radius: 50%; 
         }
     </style>
 </head>
 <body>
 
-    <h2>📍 Live UMN Wi-Fi Signal Map</h2>
+    <h2> Live UMN Wi-Fi Signal Map</h2>
     
     <div class="controls">
         <span class="status" id="statusText">Waiting to load data...</span>
@@ -68,40 +68,31 @@
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
-        // We create a "Layer Group" to hold our markers. 
-        // This allows us to clear old markers before drawing new ones when we hit Refresh.
         // --- ADD A CUSTOM LEGEND TO THE BOTTOM RIGHT ---
         var legend = L.control({position: 'bottomright'});
 
+        // Updated High-Contrast Color Palette
+        var labels = ["80%+", "70-79%", "60-69%", "50-59%", "40-49%", "30-39%", "20-29%", "20%-"];
+        var colors = [
+            "#1a9850", // 80+ (Dark Green)
+            "#66bd63", // 70-79 (Medium Green)
+            "#a6d96a", // 60-69 (Light Green)
+            "#d9ef8b", // 50-59 (Yellow-Green)
+            "#fee08b", // 40-49 (Yellow-Orange)
+            "#fdae61", // 30-39 (Orange)
+            "#f46d43", // 20-29 (Red-Orange)
+            "#d73027"  // < 20 (Dark Red)
+        ];
+
         legend.onAdd = function (map) {
-            // Create a new div with the class 'legend'
             var div = L.DomUtil.create('div', 'legend');
-            
-            // Define the labels and the exact colors from your if/else statements
-            var labels = ["80%+", "70-79%", "60-69%", "50-59%", "40-49%", "30-39%", "20-29%", "20%-"];
-            var colors = [
-                "rgb(0,255,0)",   // 80+
-                "rgb(115,255,0)", // 70-79
-                "rgb(180,255,0)", // 60-69
-                "rgb(255,255,0)", // 50-59
-                "rgb(255,210,0)", // 40-49
-                "rgb(255,140,0)", // 30-39
-                "rgb(255,70,0)",  // 20-29
-                "rgb(255,0,0)"    // < 20
-            ];
-
-            // Add a bold title to the legend
             div.innerHTML += '<strong>Signal Strength</strong><br>';
-
-            // Loop through our labels and generate a colored circle for each one
             for (var i = 0; i < labels.length; i++) {
                 div.innerHTML += '<i style="background:' + colors[i] + '"></i> ' + labels[i] + '<br>';
             }
-
             return div;
         };
 
-        // Add the legend to the map
         legend.addTo(map);
 
         var markerLayer = L.layerGroup().addTo(map);
@@ -110,55 +101,45 @@
         function fetchSheetData() {
             document.getElementById('statusText').innerText = "Fetching live data...";
             
-            // REPLACE THIS LINK WITH YOUR PUBLISHED CSV LINK
             var sheetCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRvvJkw8dEf6RtQ4SPHWFcmDQkunyoQlfcSS_OhtgbPX651UP-1C6Dgonf1QKdcCvlIB19BHtVNxjoq/pub?output=csv";
 
             Papa.parse(sheetCsvUrl, {
                 download: true,
-                header: false, // We treat it as a raw array [Date, Lat, Lon, Strength]
+                header: false, 
                 complete: function(results) {
-                    // Clear out any existing dots on the map
                     markerLayer.clearLayers();
                     var pointsPlotted = 0;
 
-                    // Loop through every row in the spreadsheet
                     results.data.forEach(function(row) {
-
-                        console.log(row);
-                        // Make sure the row has at least 4 columns of data
                         if (row.length >= 4) {
                             var dateStr = row[0];
                             var lat = parseFloat(row[1]);
                             var lon = parseFloat(row[2]);
                             var strength = parseInt(row[3]);
 
-                            // If lat, lon, and strength are valid numbers (this automatically skips header rows!)
                             if (!isNaN(lat) && !isNaN(lon) && !isNaN(strength) && lat !== 0 && lon !== 0) {
                                 
-                                // Determine the color
-                                var markerColor = "rgb(255,0,0)";
-                                if (strength >= 80) markerColor = "rgb(0,255,0)";
-                                else if (strength >= 70) markerColor = "rgb(115,255,0)";
-                                else if (strength >= 60) markerColor = "rgb(180,255,0)";
-                                else if (strength >= 50) markerColor = "rgb(255,255,0)";
-                                else if (strength >= 40) markerColor = "rgb(255,210,0)";
-                                else if (strength >= 30) markerColor = "rgb(255,140,0)";
-                                else if (strength >= 20) markerColor = "rgb(255,70,0)";
+                                // Map strength to the new distinct Hex colors
+                                var markerColor = "#d73027"; // Default Red
+                                if (strength >= 80) markerColor = "#1a9850";
+                                else if (strength >= 70) markerColor = "#66bd63";
+                                else if (strength >= 60) markerColor = "#a6d96a";
+                                else if (strength >= 50) markerColor = "#d9ef8b";
+                                else if (strength >= 40) markerColor = "#fee08b";
+                                else if (strength >= 30) markerColor = "#fdae61";
+                                else if (strength >= 20) markerColor = "#f46d43";
 
-                                // Create the circle marker
+                                // Create the circle marker with refined visuals
                                 var marker = L.circleMarker([lat, lon], {
-                                    radius: 8,
+                                    radius: 6,           // Slightly smaller to reduce overlap
                                     fillColor: markerColor,
-                                    color: "#000",
-                                    weight: 1,
+                                    color: "#333",       // Softer border color instead of harsh black
+                                    weight: 0.5,         // Much thinner border 
                                     opacity: 1,
-                                    fillOpacity: 0.8
+                                    fillOpacity: 0.85    // High enough to be vibrant, low enough to show stacks
                                 });
 
-                                // Add a popup showing the exact date/time and strength
                                 marker.bindPopup("<b>Strength:</b> " + strength + "%<br><b>Logged:</b> " + dateStr);
-                                
-                                // Add the marker to our map layer
                                 marker.addTo(markerLayer);
                                 pointsPlotted++;
                             }
