@@ -21,7 +21,7 @@ Note: The event name MUST be the same name listed in GopherFi.cpp Line 36 (We us
 The URL in the webhook builder can be found within the App Script under Deploy > Manage Deployments > URL. Copy and paste this URL to the webhook.
 
 Once the spreadsheet is setup, go to Share > Publish to Web on Google Sheets. The second option should be reading "Web Page".
-Change this to "Comma-Separated Values (.csv). Copy the link displayed and paste it into the html file as the variable "sheetCsvUrl" (line 113).
+Change this to "Comma-Separated Values (.csv)". Copy the link displayed and paste it into the html file as the variable "sheetCsvUrl" (line 113).
 
 To view the webpage, we used GitHub pages. Simply opening the html file will not connect to the spreadsheet, because certain security issues occur without 
 proper deployment. Another option to view the html page is through cloudfare pages. 
