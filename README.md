@@ -1,5 +1,7 @@
 GopherFi by Alex Beck (beck1951@umn.edu), Hamse Salex (salex005@umn.edu), Adam Adam (adam2072@umn.edu).
 
+# Project Description
+
 The purpose of this project was to create an interactive map on an html webpage displaying the Wifi signal strength as recorded points around UMN campus. 
 The used internet connection for this project had SSID: UofM-IoT
 
@@ -28,6 +30,52 @@ proper deployment. Another option to view the html page is through cloudfare pag
 
 To add data points to the spreadsheet, press the button on the device. To plot these data points on the map, refresh the html page. To remove data points, 
 delete the corresponding row in the spreadsheet.
+
+# Hardware Components
+
+1 Photon 2 Model: PHN2
+
+1 Ultimate GPS Breakout v3 Model: PA1616D
+
+2 NeoPixel iLEDs
+
+1 220 Ω Resistor 
+
+1 PushButton Switch
+
+2 10μF Capacitors
+
+# Circuit Diagram
+```
+                                   220 Ω                                             
+                   ┌───────────────vvvvv─────────┐                                   
+   Photon P2       │                             │                                   
+┌─────────────┐    │                             │       iLED                iLED    
+│             │    │                             │   ┌──────────┐        ┌──────────┐
+│          MO─┼────┘          Button             └───┼─DI    DO─┼────────┼─DI       │
+│             │             ┌────────┐               │          │        │          │
+│          D3─┼─────────────┼─S1     │           GND─┼─GND      │    GND─┼─GND      │
+│             │             │        │               │          │        │          │
+│             │          3V─┼─3V     │            5V─┼─5V       │     5V─┼─5V       │
+│             │             └────────┘               └──────────┘        └──────────┘
+│             │                                                                      
+│             │                                                                      
+│             │                                                                      
+│          TX─┼─────────────────┐          Ultimate GPS                              
+│             │                 │                                                    
+│          RX─┼────────────┐    │          Breakout  v3                              
+│             │            │    │        ┌──────────────┐                            
+│             │            │    │        │              │                            
+│             │            │    └────────┼─RX           │         3V    5V           
+│             │            │             │              │          │     │           
+│         3V3─┼───3V       └─────────────┼─TX           │    10μF ─┴─   ─┴─ 10μF     
+│             │                          │              │         ─┬─   ─┬─          
+│        VUSB─┼───5V                GND──┼─GND          │          │     │           
+│             │                          │              │         GND   GND          
+│         GND─┼───GND                3V──┼─VIN          │                            
+│             │                          │              │                            
+└─────────────┘                          └──────────────┘
+```
 
 
 
