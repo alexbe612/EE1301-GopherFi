@@ -1,5 +1,6 @@
 {
     "particle.targetDevice": "alex_photon",
     "particle.targetPlatform": "p2",
-    "particle.firmwareVersion": "6.3.5"
+    "particle.firmwareVersion": "6.3.5",
+    "C_Cpp.errorSquiggles": "disabled"
 }

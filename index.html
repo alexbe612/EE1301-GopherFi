@@ -4,10 +4,15 @@
     <title>Live UMN Wi-Fi Signal Map</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
+    <!-- The lines below act like #include statements, which include leaflet for easy map UX 
+     and PapaParse for reading a csv file -->
+       
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
+    <!-- Everything below is to set up the map, buttons and legend -->
+
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; }
         .controls { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
@@ -31,7 +36,7 @@
             margin-right: 8px;
             margin-top: 3px;
             opacity: 0.9;
-            border: 1px solid #777; /* Softer border for legend items */
+            border: 1px solid #777; 
             border-radius: 50%; 
         }
     </style>
@@ -40,23 +45,25 @@
 
     <h2> Live UMN Wi-Fi Signal Map</h2>
     
+    <!-- This button below adds new data points when pressed. It reads the values from the spreadsheet and assigns variables-->
+
     <div class="controls">
         <span class="status" id="statusText">Waiting to load data...</span>
-        <button onclick="fetchSheetData()">🔄 Refresh Map Data</button>
+        <button onclick="fetchSheetData()">🔄 Refresh Map Data</button> 
     </div>
 
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // --- 1. SET UP THE UMN BOUNDED MAP ---
+        // Bounds to confine the map to UMN
         var umnBounds = [
             [44.9650, -93.2550], // Southwest 
             [44.9880, -93.2100]  // Northeast
         ];
 
         var map = L.map('map', {
-            center: [44.9740, -93.2277], // Center on Coffman Union
+            center: [44.9740, -93.2277], // Center on Coffman
             zoom: 15,
             minZoom: 14,
             maxBounds: umnBounds,
@@ -68,11 +75,10 @@
             attribution: '&copy; OpenStreetMap'
         }).addTo(map);
 
-        // --- ADD A CUSTOM LEGEND TO THE BOTTOM RIGHT ---
+        // Legend exists in the botton right
         var legend = L.control({position: 'bottomright'});
 
-        // Updated High-Contrast Color Palette
-        // We are stretching 8 colors across a 20 to 55 range
+        // Assigns colors on the legend to the values listed
         var labels = ["55+", "50-54", "45-49", "40-44", "35-39", "30-34", "25-29", "< 25"];
         var colors = [
             "#1a9850", 
@@ -98,10 +104,12 @@
 
         var markerLayer = L.layerGroup().addTo(map);
 
-        // --- 2. FUNCTION TO FETCH AND PLOT GOOGLE SHEET DATA ---
+        // Recieves data points from the spreadsheet
         function fetchSheetData() {
             document.getElementById('statusText').innerText = "Fetching live data...";
             
+            // Link to the spreadsheet as a csv file
+
             var sheetCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRvvJkw8dEf6RtQ4SPHWFcmDQkunyoQlfcSS_OhtgbPX651UP-1C6Dgonf1QKdcCvlIB19BHtVNxjoq/pub?output=csv";
 
             Papa.parse(sheetCsvUrl, {
@@ -120,8 +128,8 @@
 
                             if (!isNaN(lat) && !isNaN(lon) && !isNaN(strength) && lat !== 0 && lon !== 0) {
                                 
-                                // Map strength to the new distinct Hex colors
-                                var markerColor = "#d73027"; // Default Dark Red (for < 25 and -1)
+                                // Assigns the points on the map with colors
+                                var markerColor = "#d73027"; // Default Dark Red 
 
                                 if (strength >= 55) markerColor = "#1a9850";      // Dark Green
                                 else if (strength >= 50) markerColor = "#66bd63"; // Medium Green
@@ -158,7 +166,7 @@
             });
         }
 
-        // --- 3. AUTO-LOAD DATA WHEN THE PAGE OPENS ---
+        // Initially logs data when opening the page instead of pressing the refresh button
         fetchSheetData();
 
     </script>

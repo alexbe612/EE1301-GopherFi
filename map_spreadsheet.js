@@ -1,25 +1,25 @@
 function doPost(e) {
-  // Get the active sheet
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   
-  // Particle sends the string payload in a parameter called "data"
+  // Sets the output sheet to the current one, and gets the data from the particle event as a JSON
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   var rawData = e.parameter.data; 
 
   try {
-    // Because your format [x,y,z] is a valid JSON array, we can parse it instantly!
+    
+    // Splits the JSON data into 3 values based on latitude, longitude, and signal strength
     var sensorValues = JSON.parse(rawData); 
     
-    // Create a new row starting with the current date/time, followed by your 3 values
+    // Creates a row with 4 columns: The date, and the 3 values obtained from the JSON (particle event)
     var newRow = [new Date()].concat(sensorValues);
     
-    // Append the row to the bottom of the sheet
+    // Places the data into the next blank row
     sheet.appendRow(newRow);
     
-    // Return a success message
+    // The return values only show withn the script editor and were used for debugging
     return ContentService.createTextOutput("Success");
     
   } catch(error) {
-    // If something goes wrong (e.g., bad formatting), log it
+    
     return ContentService.createTextOutput("Error parsing data: " + error.toString());
   }
 }
