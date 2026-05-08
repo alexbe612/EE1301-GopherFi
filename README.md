@@ -1,3 +1,5 @@
+GopherFi by Alex Beck (beck1951@umn.edu), Hamse Salex (salex005@umn.edu), Adam Adam (adam2072@umn.edu).
+
 The purpose of this project was to create an interactive map on an html webpage displaying the Wifi signal strength as recorded points around UMN campus. 
 The used internet connection for this project had SSID: UofM-IoT
 
